@@ -1,7 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import base64
-import json
 
 # Configurazione Telegram
 chat_id = '1885923992'  # Il tuo ID
@@ -10,11 +8,8 @@ token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token del bot
 # URL della pagina delle circolari
 url = 'https://liceoartisticopistoia.edu.it/circolari/'
 
-# Dettagli del repository GitHub
-github_token = 'tuo_github_token'  # Sostituisci con il tuo token GitHub
-repo_owner = 'tuo_nome_utente_github'  # Sostituisci con il tuo nome utente GitHub
-repo_name = 'tuo_repository'  # Sostituisci con il nome del tuo repository
-file_path = 'last_circular.txt'  # Percorso del file nel repository
+# Percorso del file per salvare l'ultimo titolo
+file_path = 'last_circular.txt'
 
 # Funzione per inviare un messaggio su Telegram tramite l'API
 def send_telegram_message(message):
@@ -41,78 +36,35 @@ def get_latest_circular():
     
     return circular_title, circular_link
 
-# Funzione per leggere il titolo dell'ultima circolare dal file su GitHub
+# Funzione per leggere il titolo dell'ultima circolare dal file
 def get_last_saved_circular():
-    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
-    headers = {'Authorization': f'token {github_token}'}
-    response = requests.get(api_url, headers=headers)
-    
-    if response.status_code == 200:
-        content = response.json()
-        # Decodifica il contenuto del file (Base64)
-        file_content = base64.b64decode(content['content']).decode('utf-8').strip()
-        return file_content
-    else:
-        print(f"Errore nel recupero del file su GitHub: {response.status_code}")
+    try:
+        with open(file_path, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
         return None
 
-# Funzione per aggiornare il titolo della circolare su GitHub
-def update_last_saved_circular(new_title):
-    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
-    headers = {'Authorization': f'token {github_token}'}
-    
-    # Prendi l'ultima versione del file per aggiornare il contenuto
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == 200:
-        content = response.json()
-        sha = content['sha']
-        
-        # Codifica il nuovo titolo in Base64
-        new_content = base64.b64encode(new_title.encode('utf-8')).decode('utf-8')
-        
-        # Carica il nuovo file su GitHub
-        payload = {
-            "message": "Aggiorna il titolo dell'ultima circolare",
-            "content": new_content,
-            "sha": sha
-        }
-        response = requests.put(api_url, headers=headers, json=payload)
-        if response.status_code == 200:
-            print("File aggiornato con successo!")
-        else:
-            print(f"Errore nell'aggiornamento del file: {response.status_code}")
-    else:
-        # Se il file non esiste, crealo
-        create_file_on_github(new_title)
-
-# Funzione per creare un nuovo file su GitHub se non esiste
-def create_file_on_github(content):
-    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
-    headers = {'Authorization': f'token {github_token}'}
-    new_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
-    
-    payload = {
-        "message": "Creazione file last_circular.txt",
-        "content": new_content
-    }
-    
-    response = requests.put(api_url, headers=headers, json=payload)
-    if response.status_code == 201:
-        print("File creato con successo su GitHub!")
-    else:
-        print(f"Errore nella creazione del file: {response.status_code}")
+# Funzione per salvare il titolo della circolare nel file
+def save_last_circular(title):
+    with open(file_path, 'w') as file:
+        file.write(title)
 
 # Main
 if __name__ == "__main__":
-    last_saved_title = get_last_saved_circular()
+    # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
-
+    
+    # Ottieni l'ultimo titolo salvato
+    last_saved_title = get_last_saved_circular()
+    
+    # Confronta i titoli
     if last_saved_title != circular_title:
         # Invia il messaggio su Telegram
         message = f"Nuova circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
         send_telegram_message(message)
         
-        # Aggiorna il file su GitHub con il nuovo titolo
-        update_last_saved_circular(circular_title)
+        # Salva il nuovo titolo nel file
+        save_last_circular(circular_title)
+        print("Nuova circolare trovata e file aggiornato.")
     else:
         print("Non ci sono nuove circolari.")
