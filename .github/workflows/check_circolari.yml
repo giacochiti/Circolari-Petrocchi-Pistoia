@@ -24,4 +24,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Esegui programma
-        run: python nome_del_tuo_programma.py
+        run: python check_circolari.py
