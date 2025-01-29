@@ -1,4 +1,4 @@
-import requests
+iport requests
 from bs4 import BeautifulSoup
 
 # Configurazione Telegram
