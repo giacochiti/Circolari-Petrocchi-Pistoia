@@ -1,8 +1,8 @@
 import requests
 
 # Configura il token del bot e il chat_id
-TELEGRAM_BOT_TOKEN = "7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI"
-TELEGRAM_CHAT_ID = "1885923992"
+TELEGRAM_BOT_TOKEN = "7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI"  # Sostituisci con il tuo token
+TELEGRAM_CHAT_ID = "1885923992"  # Sostituisci con il tuo chat_id
 
 # Messaggio da inviare
 message = "Ciao, mondo!"
