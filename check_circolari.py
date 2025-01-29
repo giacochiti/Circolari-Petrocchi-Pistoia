@@ -56,6 +56,23 @@ def get_last_saved_circular():
         print(f"Errore nel recupero del file su GitHub: {response.status_code}")
         return None
 
+# Funzione per creare un nuovo file su GitHub se non esiste
+def create_file_on_github(content):
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+    headers = {'Authorization': f'token {github_token}'}
+    new_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
+    
+    payload = {
+        "message": "Creazione file last_circular.txt",
+        "content": new_content
+    }
+    
+    response = requests.put(api_url, headers=headers, json=payload)
+    if response.status_code == 201:
+        print("File creato con successo su GitHub!")
+    else:
+        print(f"Errore nella creazione del file: {response.status_code}")
+
 # Funzione per aggiornare il titolo della circolare su GitHub
 def update_last_saved_circular(new_title):
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
@@ -83,6 +100,7 @@ def update_last_saved_circular(new_title):
             print(f"Errore nell'aggiornamento del file: {response.status_code}")
     else:
         print(f"Errore nel recupero del file per l'aggiornamento: {response.status_code}")
+        create_file_on_github(new_title)
 
 # Main
 if __name__ == "__main__":
