@@ -20,7 +20,4 @@ jobs:
         run: pip install requests
 
       - name: Run Python script
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python send_message.py
