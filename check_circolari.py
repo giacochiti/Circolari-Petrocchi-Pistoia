@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import base64
 import json
 
 # Configurazione Telegram
@@ -49,8 +50,8 @@ def get_last_saved_circular():
     if response.status_code == 200:
         content = response.json()
         # Decodifica il contenuto del file (Base64)
-        file_content = json.loads(content['content'])
-        return file_content.strip()
+        file_content = base64.b64decode(content['content']).decode('utf-8').strip()
+        return file_content
     else:
         print(f"Errore nel recupero del file su GitHub: {response.status_code}")
         return None
@@ -65,8 +66,9 @@ def update_last_saved_circular(new_title):
     if response.status_code == 200:
         content = response.json()
         sha = content['sha']
-        # Prepara il nuovo contenuto del file (Base64)
-        new_content = json.dumps(new_title).encode('utf-8')
+        
+        # Codifica il nuovo titolo in Base64
+        new_content = base64.b64encode(new_title.encode('utf-8')).decode('utf-8')
         
         # Carica il nuovo file su GitHub
         payload = {
@@ -96,4 +98,3 @@ if __name__ == "__main__":
         update_last_saved_circular(circular_title)
     else:
         print("Non ci sono nuove circolari.")
-
