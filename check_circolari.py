@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import re  # Per utilizzare espressioni regolari
 
 # URL della pagina delle circolari
 url = "https://liceoartisticopistoia.edu.it/circolari/"
@@ -32,21 +31,19 @@ if response.status_code == 200:
     # Parsing del contenuto HTML
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Trova il primo titolo della circolare
-    ultima_circolare = soup.find('strong', class_='ptitle')
+    # Trova il primo link della circolare
+    ultima_circolare = soup.find('a', class_='more')
 
-    # Estrai il numero dalla circolare usando espressioni regolari
-    numero_circolare = None
+    # Estrai il link dalla circolare
+    link_circolare = None
     if ultima_circolare:
-        match = re.search(r'Circolare n\.\s*(\d+)', ultima_circolare.text.strip())
-        if match:
-            numero_circolare = match.group(1)
+        link_circolare = ultima_circolare.get('href')
 
     # Crea il messaggio
-    if numero_circolare:
-        message = f"Numero dell'ultima circolare: {numero_circolare}"
+    if link_circolare:
+        message = f"Link dell'ultima circolare: {link_circolare}"
     else:
-        message = "Numero della circolare non trovato."
+        message = "Link della circolare non trovato."
 
     # Invia il messaggio su Telegram
     send_telegram_message(message)
