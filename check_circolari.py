@@ -1,52 +1,99 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 
-# URL della pagina delle circolari
-url = "https://liceoartisticopistoia.edu.it/circolari/"
-
-# ID del tuo Telegram e token del bot
+# Configurazione Telegram
 chat_id = '1885923992'  # Il tuo ID
 token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token del bot
 
-# URL dell'API di Telegram
-telegram_api_url = f"https://api.telegram.org/bot{token}/sendMessage"
+# URL della pagina delle circolari
+url = 'https://liceoartisticopistoia.edu.it/circolari/'
 
-# Funzione per inviare il messaggio a Telegram
+# Dettagli del repository GitHub
+github_token = 'tuo_github_token'
+repo_owner = 'tuo_nome_utente_github'
+repo_name = 'tuo_repository'
+file_path = 'last_circular.txt'
+
+# Funzione per inviare un messaggio su Telegram tramite l'API
 def send_telegram_message(message):
+    api_url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
         'chat_id': chat_id,
         'text': message
     }
-    response = requests.post(telegram_api_url, data=payload)
+    response = requests.post(api_url, data=payload)
     if response.status_code == 200:
-        print("Messaggio inviato con successo su Telegram.")
+        print("Messaggio inviato con successo!")
     else:
-        print("Errore nell'invio del messaggio su Telegram.")
+        print(f"Errore nell'invio del messaggio: {response.status_code}")
 
-# Effettua la richiesta HTTP al sito
-response = requests.get(url)
-
-# Controlla se la richiesta è andata a buon fine
-if response.status_code == 200:
-    # Parsing del contenuto HTML
+# Funzione per ottenere l'ultima circolare
+def get_latest_circular():
+    response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Trova il primo elemento della circolare più recente
+    latest_circular_element = soup.find('div', class_='wpdm-link-tpl')
+    circular_title = latest_circular_element.find('strong', class_='ptitle').text.strip()
+    circular_link = latest_circular_element.find('a')['href']
+    
+    return circular_title, circular_link
 
-    # Trova il primo link della circolare
-    ultima_circolare = soup.find('a', class_='more')
-
-    # Estrai il link dalla circolare
-    link_circolare = None
-    if ultima_circolare:
-        link_circolare = ultima_circolare.get('href')
-
-    # Crea il messaggio
-    if link_circolare:
-        message = f"Link dell'ultima circolare: {link_circolare}"
+# Funzione per leggere il titolo dell'ultima circolare dal file su GitHub
+def get_last_saved_circular():
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+    headers = {'Authorization': f'token {github_token}'}
+    response = requests.get(api_url, headers=headers)
+    
+    if response.status_code == 200:
+        content = response.json()
+        # Decodifica il contenuto del file (Base64)
+        file_content = json.loads(content['content'])
+        return file_content.strip()
     else:
-        message = "Link della circolare non trovato."
+        print(f"Errore nel recupero del file su GitHub: {response.status_code}")
+        return None
 
-    # Invia il messaggio su Telegram
-    send_telegram_message(message)
+# Funzione per aggiornare il titolo della circolare su GitHub
+def update_last_saved_circular(new_title):
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+    headers = {'Authorization': f'token {github_token}'}
+    
+    # Prendi l'ultima versione del file per aggiornare il contenuto
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        content = response.json()
+        sha = content['sha']
+        # Prepara il nuovo contenuto del file (Base64)
+        new_content = json.dumps(new_title).encode('utf-8')
+        
+        # Carica il nuovo file su GitHub
+        payload = {
+            "message": "Aggiorna il titolo dell'ultima circolare",
+            "content": new_content,
+            "sha": sha
+        }
+        response = requests.put(api_url, headers=headers, json=payload)
+        if response.status_code == 200:
+            print("File aggiornato con successo!")
+        else:
+            print(f"Errore nell'aggiornamento del file: {response.status_code}")
+    else:
+        print(f"Errore nel recupero del file per l'aggiornamento: {response.status_code}")
 
-else:
-    print("Errore durante l'accesso al sito. Codice di stato:", response.status_code)
+# Main
+if __name__ == "__main__":
+    last_saved_title = get_last_saved_circular()
+    circular_title, circular_link = get_latest_circular()
+
+    if last_saved_title != circular_title:
+        # Invia il messaggio su Telegram
+        message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+        send_telegram_message(message)
+        
+        # Aggiorna il file su GitHub con il nuovo titolo
+        update_last_saved_circular(circular_title)
+    else:
+        print("Non ci sono nuove circolari.")
+
