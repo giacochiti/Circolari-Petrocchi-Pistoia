@@ -11,10 +11,10 @@ token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token del bot
 url = 'https://liceoartisticopistoia.edu.it/circolari/'
 
 # Dettagli del repository GitHub
-github_token = 'tuo_github_token'
-repo_owner = 'tuo_nome_utente_github'
-repo_name = 'tuo_repository'
-file_path = 'last_circular.txt'
+github_token = 'tuo_github_token'  # Sostituisci con il tuo token GitHub
+repo_owner = 'tuo_nome_utente_github'  # Sostituisci con il tuo nome utente GitHub
+repo_name = 'tuo_repository'  # Sostituisci con il nome del tuo repository
+file_path = 'last_circular.txt'  # Percorso del file nel repository
 
 # Funzione per inviare un messaggio su Telegram tramite l'API
 def send_telegram_message(message):
@@ -56,23 +56,6 @@ def get_last_saved_circular():
         print(f"Errore nel recupero del file su GitHub: {response.status_code}")
         return None
 
-# Funzione per creare un nuovo file su GitHub se non esiste
-def create_file_on_github(content):
-    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
-    headers = {'Authorization': f'token {github_token}'}
-    new_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
-    
-    payload = {
-        "message": "Creazione file last_circular.txt",
-        "content": new_content
-    }
-    
-    response = requests.put(api_url, headers=headers, json=payload)
-    if response.status_code == 201:
-        print("File creato con successo su GitHub!")
-    else:
-        print(f"Errore nella creazione del file: {response.status_code}")
-
 # Funzione per aggiornare il titolo della circolare su GitHub
 def update_last_saved_circular(new_title):
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
@@ -99,8 +82,25 @@ def update_last_saved_circular(new_title):
         else:
             print(f"Errore nell'aggiornamento del file: {response.status_code}")
     else:
-        print(f"Errore nel recupero del file per l'aggiornamento: {response.status_code}")
+        # Se il file non esiste, crealo
         create_file_on_github(new_title)
+
+# Funzione per creare un nuovo file su GitHub se non esiste
+def create_file_on_github(content):
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+    headers = {'Authorization': f'token {github_token}'}
+    new_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
+    
+    payload = {
+        "message": "Creazione file last_circular.txt",
+        "content": new_content
+    }
+    
+    response = requests.put(api_url, headers=headers, json=payload)
+    if response.status_code == 201:
+        print("File creato con successo su GitHub!")
+    else:
+        print(f"Errore nella creazione del file: {response.status_code}")
 
 # Main
 if __name__ == "__main__":
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     if last_saved_title != circular_title:
         # Invia il messaggio su Telegram
-        message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+        message = f"Nuova circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
         send_telegram_message(message)
         
         # Aggiorna il file su GitHub con il nuovo titolo
