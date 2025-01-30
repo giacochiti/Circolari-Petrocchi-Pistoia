@@ -2,9 +2,8 @@ name: Controllo Circolari
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # Esegui ogni 3 ore
+    - cron: '*/1 * * * *'  # Esegui ogni minuto
   workflow_dispatch:  # Consente di avviare manualmente
-
 jobs:
   run:
     runs-on: ubuntu-latest
