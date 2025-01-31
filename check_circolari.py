@@ -54,6 +54,8 @@ def get_latest_circular():
 def save_last_circular(title):
     with open(file_path, 'w') as file:
         file.write(title)
+        file.flush()  # Assicurati che il contenuto venga scritto immediatamente
+        file.close()  # Chiudi il file esplicitamente
 
 # Main
 if __name__ == "__main__":
