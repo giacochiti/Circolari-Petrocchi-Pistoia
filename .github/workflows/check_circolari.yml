@@ -3,7 +3,7 @@ name: Controllo Circolari
 on:
   schedule:
     #- cron: '*/1 * * * *'  # Esegui ogni minuto
-    - cron: '0 */2 * * *'
+    - cron: '0 */2 * * *'   #Esegui ogni 2 ore
   workflow_dispatch:  # Consente di avviare manualmente
 
 jobs:
