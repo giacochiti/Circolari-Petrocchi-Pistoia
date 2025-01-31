@@ -1,15 +1,19 @@
 import requests
 from bs4 import BeautifulSoup
+import logging
 
 # Configurazione Telegram
 chat_id = '1885923992'  # Il tuo ID
-token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token el bot
+token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token del bot
 
 # URL della pagina delle circolari
 url = 'https://liceoartisticopistoia.edu.it/circolari/'
 
 # Percorso del file per salvare l'ultimo titolo
 file_path = 'last_circular.txt'
+
+# Configurazione logging
+logging.basicConfig(level=logging.INFO)
 
 # Funzione per inviare un messaggio su Telegram tramite l'API
 def send_telegram_message(message):
@@ -20,9 +24,9 @@ def send_telegram_message(message):
     }
     response = requests.post(api_url, data=payload)
     if response.status_code == 200:
-        print("Messaggio inviato con successo!")
+        logging.info("Messaggio inviato con successo!")
     else:
-        print(f"Errore nell'invio del messaggio: {response.status_code}")
+        logging.error(f"Errore nell'invio del messaggio: {response.status_code}")
 
 # Funzione per ottenere l'ultima circolare
 def get_latest_circular():
@@ -31,6 +35,10 @@ def get_latest_circular():
     
     # Trova il primo elemento della circolare più recente
     latest_circular_element = soup.find('div', class_='wpdm-link-tpl')
+    if latest_circular_element is None:
+        logging.error("Impossibile trovare l'elemento della circolare più recente.")
+        return None, None
+    
     circular_title = latest_circular_element.find('strong', class_='ptitle').text.strip()
     circular_link = latest_circular_element.find('a')['href']
     
@@ -54,17 +62,20 @@ if __name__ == "__main__":
     # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
     
-    # Ottieni l'ultimo titolo salvato
-    last_saved_title = get_last_saved_circular()
-    
-    # Confronta i titoli
-    if last_saved_title != circular_title:
-        # Invia il messaggio su Telegram
-        message = f"Nuova circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
-        send_telegram_message(message)
-        
-        # Salva il nuovo titolo nel file
-        save_last_circular(circular_title)
-        print("Nuova circolare trovata e file aggiornato.")
+    if circular_title is None:
+        logging.error("Errore nel recupero della circolare più recente.")
     else:
-        print("Non ci sono nuove circolari.")
+        # Ottieni l'ultimo titolo salvato
+        last_saved_title = get_last_saved_circular()
+        
+        # Confronta i titoli
+        if last_saved_title != circular_title:
+            # Invia il messaggio su Telegram
+            message = f"Nuova circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+            send_telegram_message(message)
+            
+            # Salva il nuovo titolo nel file
+            save_last_circular(circular_title)
+            logging.info("Nuova circolare trovata e file aggiornato.")
+        else:
+            logging.info("Non ci sono nuove circolari.")
