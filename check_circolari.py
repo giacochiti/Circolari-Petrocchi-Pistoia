@@ -51,5 +51,25 @@ def manage_circular_file(circular_title):
 
         # Confronta il titolo salvato con circular_title
         if saved_title == circular_title:
-            # Se sono
+            # Se sono uguali, interrompe l'esecuzione
+            print("Il titolo è uguale all'ultimo salvato. Programma terminato.")
+            exit()  # Esce dal programma
+        else:
+            # Se sono diversi, aggiorna il file con il nuovo titolo
+            with open(file_path, 'w') as file:
+                file.write(circular_title)
+            print(f"Il titolo è cambiato. File aggiornato con: {circular_title}")
 
+# Main
+if __name__ == "__main__":
+    # Ottieni l'ultima circolare dal sito
+    circular_title, circular_link = get_latest_circular()
+    
+    # Confronta le circolari
+    manage_circular_file(circular_title)
+    
+    # Crea il messaggio da inviare
+    message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+
+    # Invia il messaggio su Telegram
+    send_telegram_message(message)
