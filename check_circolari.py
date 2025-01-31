@@ -29,6 +29,10 @@ def get_latest_circular():
     
     # Trova il primo elemento della circolare più recente
     latest_circular_element = soup.find('div', class_='wpdm-link-tpl')
+    if latest_circular_element is None:
+        print("Impossibile trovare l'elemento della circolare più recente.")
+        return None, None
+
     circular_title = latest_circular_element.find('strong', class_='ptitle').text.strip()
     circular_link = latest_circular_element.find('a')['href']
     
@@ -53,24 +57,31 @@ def manage_circular_file(circular_title):
         if saved_title == circular_title:
             # Se sono uguali, interrompe l'esecuzione
             print("Il titolo è uguale all'ultimo salvato. Programma terminato.")
-            exit()  # Esce dal programma
+            return False
         else:
             # Se sono diversi, aggiorna il file con il nuovo titolo
             with open(file_path, 'w') as file:
                 file.write(circular_title)
             print(f"Il titolo è cambiato. File aggiornato con: {circular_title}")
-
+            return True
 
 # Main
 if __name__ == "__main__":
     # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
     
-    # Crea il messaggio da inviare
-    message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
-    
-    # Invia il messaggio su Telegram
-    send_telegram_message(message)
+    if circular_title is None or circular_link is None:
+        print("Errore nel recuperare l'ultima circolare.")
+    else:
+        # Confronta le circolari
+        if manage_circular_file(circular_title):
+            # Crea il messaggio da inviare
+            message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+            
+            # Invia il messaggio su Telegram
+            send_telegram_message(message)
+        else:
+            print("Nessun nuovo messaggio inviato.")
 
 
 
