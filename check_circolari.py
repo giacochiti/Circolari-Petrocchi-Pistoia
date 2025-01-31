@@ -63,14 +63,15 @@ if __name__ == "__main__":
     # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
     
-    # Confronta i titoli
+    # Confronta i titoli e invia i messaggi solo se sono diversi
     if last_saved_title != circular_title:
         # Aggiorna il file con il nuovo titolo
         save_last_circular(circular_title)
-        last_saved_title = circular_title
-    
-    # Invia il contenuto di last_circular.txt e il link all'ultima circolare
-    if last_saved_title:
-        send_telegram_message(f"Contenuto di last_circular.txt:\n{last_saved_title}\nLink: {circular_link}")
+        
+        # Invia il contenuto di last_circular.txt e il link all'ultima circolare
+        if circular_title:
+            send_telegram_message(f"Contenuto di last_circular.txt:\n{circular_title}\nLink: {circular_link}")
+        else:
+            print("Non è stato possibile leggere il contenuto del file.")
     else:
-        print("Non è stato possibile leggere il contenuto del file.")
+        print("Il contenuto di last_circular.txt è uguale al titolo dell'ultima circolare. Nessun messaggio inviato.")
