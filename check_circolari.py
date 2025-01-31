@@ -50,18 +50,27 @@ def get_latest_circular():
     
     return circular_title, circular_link
 
+# Funzione per salvare il titolo della circolare nel file
+def save_last_circular(title):
+    with open(file_path, 'w') as file:
+        file.write(title)
+
 # Main
 if __name__ == "__main__":
     # Leggi il contenuto del file last_circular.txt
-    circular_content = read_last_circular()
-    if circular_content:
-        send_telegram_message(f"Contenuto di last_circular.txt:\n{circular_content}")
-    else:
-        print("Non è stato possibile leggere il contenuto del file.")
+    last_saved_title = read_last_circular()
     
     # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
-    if circular_title:
-        send_telegram_message(f"Nuova circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}")
+    
+    # Confronta i titoli
+    if last_saved_title != circular_title:
+        # Aggiorna il file con il nuovo titolo
+        save_last_circular(circular_title)
+        last_saved_title = circular_title
+    
+    # Invia il contenuto di last_circular.txt e il link all'ultima circolare
+    if last_saved_title:
+        send_telegram_message(f"Contenuto di last_circular.txt:\n{last_saved_title}\nLink: {circular_link}")
     else:
-        print("Non è stato possibile recuperare l'ultima circolare dal sito.")
+        print("Non è stato possibile leggere il contenuto del file.")
