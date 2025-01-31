@@ -7,7 +7,7 @@ def read_last_circular():
         with open(file_path, 'r') as file:
             content = file.read().strip()
             # Estrai il numero dalla stringa
-            number = int(content.split()[-1])
+            number = int(content)
             return number
     except FileNotFoundError:
         print("Il file last_circular.txt non è stato trovato.")
@@ -19,9 +19,7 @@ def read_last_circular():
 # Funzione per salvare il nuovo numero nel file
 def save_new_circular(number):
     with open(file_path, 'w') as file:
-        file.write(f"circolare n {number}")
-        file.flush()  # Assicurati che il contenuto venga scritto immediatamente
-        file.close()  # Chiudi il file esplicitamente
+        file.write(f"{number}")
 
 # Main
 if __name__ == "__main__":
