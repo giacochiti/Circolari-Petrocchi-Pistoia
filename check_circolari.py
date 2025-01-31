@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # Ottieni l'ultima circolare dal sito
     circular_title, circular_link = get_latest_circular()
     # Confronta le circolari:
-     manage_circular_file(circular_title)
+    manage_circular_file(circular_title)
     # Crea il messaggio da inviare
     message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
     
