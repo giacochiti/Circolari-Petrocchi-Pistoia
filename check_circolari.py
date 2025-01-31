@@ -29,14 +29,18 @@ def get_latest_circular():
     # Trova il primo elemento della circolare più recente
     latest_circular_element = soup.find('div', class_='wpdm-link-tpl')
     circular_title = latest_circular_element.find('strong', class_='ptitle').text.strip()
+    circular_link = latest_circular_element.find('a')['href']
     
-    return circular_title
+    return circular_title, circular_link
 
 # Main
 if __name__ == "__main__":
     # Ottieni l'ultima circolare dal sito
-    circular_title = get_latest_circular()
+    circular_title, circular_link = get_latest_circular()
     
-    # Invia il titolo della circolare tramite Telegram
-    message = f"Ultima circolare pubblicata: {circular_title}"
+    # Crea il messaggio da inviare
+    message = f"Ultima circolare pubblicata:\nTitolo: {circular_title}\nLink: {circular_link}"
+    
+    # Invia il messaggio su Telegram
     send_telegram_message(message)
+
