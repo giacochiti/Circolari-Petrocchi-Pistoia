@@ -1,3 +1,6 @@
+
+
+
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -42,28 +45,32 @@ def get_latest_circular():
 def manage_circular_file(circular_title):
     file_path = 'ultima.txt'
     
-    # Controlla se il file esiste
-    if not os.path.exists(file_path):
-        # Se il file non esiste, crealo e scrivi circular_title
-        with open(file_path, 'w') as file:
-            file.write(circular_title)
-        print(f"File creato. Titolo circolare salvato: {circular_title}")
-    else:
-        # Se il file esiste, leggi il contenuto
-        with open(file_path, 'r') as file:
-            saved_title = file.read().strip()
-        
-        # Confronta il titolo salvato con circular_title
-        if saved_title == circular_title:
-            # Se sono uguali, interrompe l'esecuzione
-            print("Il titolo è uguale all'ultimo salvato. Programma terminato.")
-            return False
-        else:
-            # Se sono diversi, aggiorna il file con il nuovo titolo
+    try:
+        # Controlla se il file esiste
+        if not os.path.exists(file_path):
+            # Se il file non esiste, crealo e scrivi circular_title
             with open(file_path, 'w') as file:
                 file.write(circular_title)
-            print(f"Il titolo è cambiato. File aggiornato con: {circular_title}")
-            return True
+            print(f"File creato. Titolo circolare salvato: {circular_title}")
+        else:
+            # Se il file esiste, leggi il contenuto
+            with open(file_path, 'r') as file:
+                saved_title = file.read().strip()
+            
+            # Confronta il titolo salvato con circular_title
+            if saved_title == circular_title:
+                # Se sono uguali, interrompe l'esecuzione
+                print("Il titolo è uguale all'ultimo salvato. Programma terminato.")
+                return False
+            else:
+                # Se sono diversi, aggiorna il file con il nuovo titolo
+                with open(file_path, 'w') as file:
+                    file.write(circular_title)
+                print(f"Il titolo è cambiato. File aggiornato con: {circular_title}")
+                return True
+    except Exception as e:
+        print(f"Errore durante la gestione del file: {e}")
+        return False
 
 # Main
 if __name__ == "__main__":
@@ -82,6 +89,3 @@ if __name__ == "__main__":
             send_telegram_message(message)
         else:
             print("Nessun nuovo messaggio inviato.")
-
-
-
