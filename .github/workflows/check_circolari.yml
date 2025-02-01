@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'  # Sostituisci con la versione che usi
+          python-version: '3.12.1'  # Sostituisci con la versione che usi
 
       - name: Install dependencies
         run: pip install -r requirements.txt  # Se hai dipendenze
