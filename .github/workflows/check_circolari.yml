@@ -43,6 +43,8 @@ jobs:
           cat ultima.txt
           echo "Confronto titolo corrente vs titolo ultima.txt"
           python -c "
+import sys
+sys.path.append('.')  # Aggiungi il percorso corrente per cercare i moduli
 import check_circolari
 title_from_file = check_circolari.leggi_titolo_da_file('ultima.txt')
 title_from_site = check_circolari.leggi_titolo_dal_sito()
