@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "Titolo corrente dal sito:"
           python check_circolari.py --debug  # Esegui il programma con eventuali flag di debug
-          
+
       # 6. Aggiungi debug per il confronto
       - name: Debugging title comparison
         run: |
@@ -43,16 +43,16 @@ jobs:
           cat ultima.txt
           echo "Confronto titolo corrente vs titolo ultima.txt"
           python -c "
-import check_circolari;
-title_from_file = check_circolari.leggi_titolo_da_file('ultima.txt');
-title_from_site = check_circolari.leggi_titolo_dal_sito();
-print(f'Titolo da file: {title_from_file}');
-print(f'Titolo dal sito: {title_from_site}');
+import check_circolari
+title_from_file = check_circolari.leggi_titolo_da_file('ultima.txt')
+title_from_site = check_circolari.leggi_titolo_dal_sito()
+print(f'Titolo da file: {title_from_file}')
+print(f'Titolo dal sito: {title_from_site}')
 if title_from_file != title_from_site:
-    print('I titoli sono diversi. Invierò il messaggio.');
+    print('I titoli sono diversi. Invierò il messaggio.')
 else:
     print('I titoli sono uguali. Nessuna azione necessaria.')
-          "  # Assicurati che 'leggi_titolo_da_file' e 'leggi_titolo_dal_sito' siano funzioni nel tuo programma
+          "
 
       # 7. Commit e push di ultima.txt per mantenere le modifiche
       - name: Commit and push changes
