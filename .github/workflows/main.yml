@@ -25,13 +25,15 @@ jobs:
       - name: Esegui script check_circolari.py
         run: python check_circolari.py
 
-      - name: Commit e push delle modifiche
+      - name: Commit e push delle modifiche se presenti
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git stash  # Salva temporaneamente le modifiche locali
-          git pull --rebase  # Scarica le modifiche dal repository remoto
-          git stash pop  # Ripristina le modifiche locali
-          git add ultima.txt
-          git commit -m "Aggiornato ultima.txt" || echo "Nessuna modifica da commitare"
-          git push
+          git fetch # Recupera eventuali modifiche dal repository remoto
+          if git diff --exit-code ultima.txt; then
+            echo "Nessuna modifica da commitare"
+          else
+            git add ultima.txt
+            git commit -m "Aggiornato ultima.txt"
+            git push
+          fi
