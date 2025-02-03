@@ -1,14 +1,10 @@
-name: Esegui check_circolari ogni 5 minuti
-
+name:  Controlla Circolari
 on:
-  schedule:
-    - cron: "*/5 * * * *"  # Esegue il workflow ogni 5 minuti
   workflow_dispatch:  # Permette di eseguire manualmente il workflow
 
 jobs:
-  run-script:
+  run-python-script:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -18,9 +14,16 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt || echo "No dependencies to install"
-
-      - name: Esegui script check_circolari.py
+      - name: Esegui script Python
         run: python check_circolari.py
+
+      - name: Commit e push delle modifiche
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git stash  # Salva temporaneamente le modifiche locali
+          git pull --rebase  # Scarica le modifiche dal repository remoto
+          git stash pop  # Ripristina le modifiche locali
+          git add ultima.txt
+          git commit -m "Aggiornato ultima.txt" || echo "Nessuna modifica da commitare"
+          git push
