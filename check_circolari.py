@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # Configurazione Telegram
-chat_id = '1885923992'  # Il tuo ID
+chat_id = '-1002309715979'  # Il tuo ID
 token = '7305004967:AAGe1tySkfUANi9yp0Jh2uBNAJeWwHUG2SI'  # Il token del bot
 
 # URL della pagina delle circolari
